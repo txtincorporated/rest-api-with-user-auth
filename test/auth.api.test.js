@@ -132,17 +132,17 @@ describe('Test authorization routes...', () => {
     });
 
     it('accepts valid token on requiring routes', done => {
-      // console.log('Token:  ', token);
+      console.log('Token:  ', token);
       request
         .post('/api/authors')
-        .set('Authorization', `Bearer ${token}`)
+        .set('authorization', 'Bearer ' + token)
         .then(res => {
-          assert.equal(res.status, 200);
+          console.log('res.body:  ', res.body);
+          assert.isOk(res.body);
         })
-        .catch(done);
+        .then(done);
       done();
     });
-
   });
 
 });
