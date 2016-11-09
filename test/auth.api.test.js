@@ -10,28 +10,29 @@ const connection = require('../lib/setup-mongoose');
 const app = require('../lib/app');
 
 describe('Test authorization routes...', () => {
-  // //If setting .env variables within file, safe to drop whole db in `before`
-  // before(done => {
-  //   const drop = () => connection.db.dropDatabase(done);
-  //   if(connection.readyState === 1) drop();
-  //   else connection.on('open' ,drop);
-  // });
-  //If setting test .env vars in `package.json`, better to just drop specific collection
+  //If setting .env variables within file, safe to drop whole db in `before`
   before(done => {
-    const CONNECTED = 1;
-    if(connection.readyState === CONNECTED) dropCollection();
-    else(connection.on('open', dropCollection));
-
-    function dropCollection() {
-      const name = 'users';
-      connection.db
-        .listCollections({name})
-        .next((err, collinfo) => {
-          if(!collinfo) return done();
-          connection.db.dropCollection(name, done);
-        });
-    };
+    const drop = () => connection.db.dropDatabase(done);
+    if(connection.readyState === 1) drop();
+    else connection.on('open' ,drop);
   });
+  //If setting test .env vars in `package.json`, better to just drop specific collection
+  // before(done => {
+  //   const CONNECTED = 1;
+  //   if(connection.readyState === CONNECTED) dropCollection();
+  //   else(connection.on('open', dropCollection));
+
+  //   function dropCollection() {
+  //     const name = 'users';
+  //     connection.db
+  //       .listCollections({name})
+  //       .next((err, collinfo) => {
+  //         if(!collinfo) return done();
+  //         connection.db.dropCollection(name, done);
+  //       });
+  //   };
+  // });
+
   const request = chai.request(app);
   const trout = {
     name: 'Kilgore Trout',
@@ -44,7 +45,7 @@ describe('Test authorization routes...', () => {
   describe('Test unauthorized request... ', () => {
 
     it('returns 400 error without token', done => {
-      console.log('starting 400 no token...');
+      // console.log('starting 400 no token...');
       request
         .post('/api/authors/')
         .send(trout)
@@ -77,8 +78,8 @@ describe('Test authorization routes...', () => {
 
   const user = {
     username: 'test user',
-    password: 'testpassword', 
-    roles: ['user', 'admin', 'super-user']
+    password: 'testpassword'
+    // roles: ['user', 'admin', 'super-user']
   };
 
   describe('Test user management functions... ', () => {
@@ -106,14 +107,19 @@ describe('Test authorization routes...', () => {
 
     let token = '';
 
-    it('yields valid token on proper signup', done => {
-      console.log('Start valid token test... ');
+    it.only('yields valid token on proper signup', done => {
+      // console.log('Start valid token test... ');
       request
         .post('/api/auth/signup')
         .send(user)
-        .then(res => assert.isOk(token = res.body.token))
+        .then(res => {
+          console.log(`**** res.body == ${res.body}\n\n\n*******\n\n\n`);
+
+          assert.isOk(token = res.body.token);
+          console.log('Token:  ', token);
+          done();
+        })
         .catch(done);
-      done();
     });
 
     it('quashes duplicate usernames', done => {
@@ -126,22 +132,21 @@ describe('Test authorization routes...', () => {
         .send(user)
         .then(res => {
           assert.equal(res.body.token, token);
+          done();
         })
-        .then(done);
-      done();
+        .catch(done);
     });
 
     it('accepts valid token on requiring routes', done => {
-      console.log('Token:  ', token);
       request
         .post('/api/authors')
         .set('authorization', 'Bearer ' + token)
         .then(res => {
-          console.log('res.body:  ', res.body);
+          // console.log('res.body:  ', res.body);
           assert.isOk(res.body);
+          done();          
         })
-        .then(done);
-      done();
+        .catch(done);
     });
   });
 

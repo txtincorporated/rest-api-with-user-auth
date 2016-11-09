@@ -9,21 +9,28 @@
 
 // describe('Test authors resource route', () => {
 
+//   //If setting .env variables within file, safe to drop whole db in `before`
 //   before(done => {
-//     const CONNECTED = 1;
-//     if(connection.readyState === CONNECTED) dropCollection();
-//     else(connection.on('open', dropCollection));
-
-//     function dropCollection() {
-//       const name = 'authors';
-//       connection.db
-//         .listCollections({name})
-//         .next((err, collinfo) => {
-//           if(!collinfo) return done();
-//           connection.db.dropCollection(name, done);
-//         });
-//     };
+//     const drop = () => connection.db.dropDatabase(done);
+//     if(connection.readyState === 1) drop();
+//     else connection.on('open' ,drop);
 //   });
+
+//   // before(done => {
+//   //   const CONNECTED = 1;
+//   //   if(connection.readyState === CONNECTED) dropCollection();
+//   //   else(connection.on('open', dropCollection));
+
+//   //   function dropCollection() {
+//   //     const name = 'authors';
+//   //     connection.db
+//   //       .listCollections({name})
+//   //       .next((err, collinfo) => {
+//   //         if(!collinfo) return done();
+//   //         connection.db.dropCollection(name, done);
+//   //       });
+//   //   };
+//   // });
 
 //   const request = chai.request(app);
 
@@ -42,6 +49,22 @@
 
 //   var authResult = null;
 
+//   const user = {
+//     username: 'test user',
+//     password: 'testpassword', 
+//     roles: ['user', 'admin', 'super-user']
+//   };
+
+//   let token = null;
+
+//   it('Sets up user login and roles', done => {
+//     request
+//       .post('/api/auth/signup')
+//       .send(user)
+//       .then(res => assert.isOk(token = res.body.token))
+//       .catch(done);
+//     done();
+//   });
 
 //   it('GET all -- before', done => {
 //     request
@@ -54,8 +77,10 @@
 //   });
 
 //   it('/POST', done => {
+//     console.log('User token: ', token);    
 //     request 
 //       .post('/api/authors')
+//       .set('authorization', 'Bearer ' + token)
 //       .send(trout)
 //       .then(res => {
 //         authResult = res.body;
