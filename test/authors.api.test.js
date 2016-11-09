@@ -3,7 +3,10 @@ const chaiHttp = require('chai-http');
 const assert = chai.assert;
 chai.use(chaiHttp);
 
-require('dotenv').config();
+if(!process.env.TRAVIS) {
+  require('dotenv').config();
+}
+
 const connection = require('../lib/setup-mongoose');
 
 const app = require('../lib/app');
@@ -120,7 +123,7 @@ describe('Test authors resource route', () => {
         console.log('authResult PUT2', authResult);
         sturgeon.__v = 0;
         sturgeon._id = authResult._id;
-        console.log('sturgeon2', sturgeon)
+        console.log('sturgeon2', sturgeon);
         assert.deepEqual(authResult, sturgeon);
         done();
       })

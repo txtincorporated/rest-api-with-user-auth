@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "MONGODB_URI=mongodb://localhost/resources-test mocha",
-    "pretest": "eslint .",
+    "lint": "eslint .",
+    "pretest": "npm run lint",
     "start": "node server.js"
   },
   "repository": {

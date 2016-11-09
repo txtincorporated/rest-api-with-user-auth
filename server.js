@@ -1,5 +1,8 @@
 const http = require('http');
-require('dotenv').config();
+
+if(!process.env.TRAVIS) {
+  require('dotenv').config();
+}
 
 const app = require('./lib/app');
 const port = process.env.PORT;

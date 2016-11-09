@@ -2,8 +2,10 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const assert = chai.assert;
 chai.use(chaiHttp);
-require('dotenv').config();
 
+if(!process.env.TRAVIS) {
+  require('dotenv').config();
+}
 //start the db, and store connection,
 //so we can clear db
 const connection = require('../lib/setup-mongoose');

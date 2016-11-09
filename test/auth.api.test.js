@@ -2,7 +2,10 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const assert = chai.assert;
 chai.use(chaiHttp);
-require('dotenv').config();
+
+if(!process.env.TRAVIS) {
+  require('dotenv').config();
+}
 
 // //If setting test-specific .env variables here...
 // const path = require('path');
@@ -52,7 +55,7 @@ describe('Test authorization routes...', () => {
       request
         .post('/api/authors/')
         .send(trout)
-        .then(res => {
+        .then(res => { // eslint-disable-line no-unused-vars
           done('status should not be 200');
         })
         .catch(res => {
@@ -68,7 +71,7 @@ describe('Test authorization routes...', () => {
         .post('/api/authors')
         .set('Authorization', 'Bearer badtoken')
         .send(trout)
-        .then(res => done('status should not be 200'))
+        .then(res => done('status should not be 200')) // eslint-disable-line no-unused-vars
         .catch(res => {
           assert.equal(res.status, 403);
           assert.equal(res.response.body.error, 'unauthorized:  invalid token');
@@ -91,7 +94,7 @@ describe('Test authorization routes...', () => {
       request
         .post(url)
         .send(send)
-        .then(res => done('status should not be 200'))
+        .then(res => done('status should not be 200')) // eslint-disable-line no-unused-vars
         .catch(res => {
           assert.equal(res.status, 400);
           assert.equal(res.response.body.error, error);
