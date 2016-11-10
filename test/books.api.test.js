@@ -18,8 +18,9 @@ describe('test books resource route', () => {
   //If setting test-specific .env variables, safe to drop whole db in `before`
   before(done => {
     const drop = () => connection.db.dropDatabase(done);
-    if(connection.readyState === 1) drop();
+    if(connection.readyState === 1) drop(done);
     else connection.on('open', drop);
+    // done();
   });
 
   // before(done => {  
