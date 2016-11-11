@@ -2,6 +2,11 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const assert = chai.assert;
 chai.use(chaiHttp);
+
+if(!process.env.TRAVIS) {
+  require('dotenv').config();
+}
+
 // //If setting test-specific .env variables here...
 // const path = require('path');
 // require('dotenv').load({path: path.join(__dirname, '.env.test')});
@@ -10,28 +15,13 @@ const connection = require('../lib/setup-mongoose');
 const app = require('../lib/app');
 
 describe('Test authorization routes...', () => {
-  //If setting .env variables within file, safe to drop whole db in `before`
+  //CAUTION:  NUCLEAR OPTION
+  //If setting test-specific .env variables, safe to drop whole db in `before`
   before(done => {
     const drop = () => connection.db.dropDatabase(done);
     if(connection.readyState === 1) drop();
     else connection.on('open' ,drop);
   });
-  //If setting test .env vars in `package.json`, better to just drop specific collection
-  // before(done => {
-  //   const CONNECTED = 1;
-  //   if(connection.readyState === CONNECTED) dropCollection();
-  //   else(connection.on('open', dropCollection));
-
-  //   function dropCollection() {
-  //     const name = 'users';
-  //     connection.db
-  //       .listCollections({name})
-  //       .next((err, collinfo) => {
-  //         if(!collinfo) return done();
-  //         connection.db.dropCollection(name, done);
-  //       });
-  //   };
-  // });
 
   const request = chai.request(app);
   const trout = {
@@ -45,11 +35,10 @@ describe('Test authorization routes...', () => {
   describe('Test unauthorized request... ', () => {
 
     it('returns 400 error without token', done => {
-      // console.log('starting 400 no token...');
       request
         .post('/api/authors/')
         .send(trout)
-        .then(res => {
+        .then(res => { // eslint-disable-line no-unused-vars
           done('status should not be 200');
         })
         .catch(res => {
@@ -65,7 +54,7 @@ describe('Test authorization routes...', () => {
         .post('/api/authors')
         .set('Authorization', 'Bearer badtoken')
         .send(trout)
-        .then(res => done('status should not be 200'))
+        .then(res => done('status should not be 200')) // eslint-disable-line no-unused-vars
         .catch(res => {
           assert.equal(res.status, 403);
           assert.equal(res.response.body.error, 'unauthorized:  invalid token');
@@ -78,8 +67,8 @@ describe('Test authorization routes...', () => {
 
   const user = {
     username: 'test user',
-    password: 'testpassword'
-    // roles: ['user', 'admin', 'super-user']
+    password: 'testpassword',
+    roles: ['user', 'admin', 'super-user']
   };
 
   describe('Test user management functions... ', () => {
@@ -88,7 +77,7 @@ describe('Test authorization routes...', () => {
       request
         .post(url)
         .send(send)
-        .then(res => done('status should not be 200'))
+        .then(res => done('status should not be 200')) // eslint-disable-line no-unused-vars
         .catch(res => {
           assert.equal(res.status, 400);
           assert.equal(res.response.body.error, error);
@@ -107,16 +96,13 @@ describe('Test authorization routes...', () => {
 
     let token = '';
 
-    it.only('yields valid token on proper signup', done => {
+    it('yields valid token on proper signup', done => {
       // console.log('Start valid token test... ');
       request
         .post('/api/auth/signup')
         .send(user)
         .then(res => {
-          console.log(`**** res.body == ${res.body}\n\n\n*******\n\n\n`);
-
           assert.isOk(token = res.body.token);
-          console.log('Token:  ', token);
           done();
         })
         .catch(done);
@@ -131,7 +117,7 @@ describe('Test authorization routes...', () => {
         .post('/api/auth/signin')
         .send(user)
         .then(res => {
-          assert.equal(res.body.token, token);
+          assert.equal(res.status, 200);
           done();
         })
         .catch(done);
@@ -141,8 +127,8 @@ describe('Test authorization routes...', () => {
       request
         .post('/api/authors')
         .set('authorization', 'Bearer ' + token)
+        .send(trout)
         .then(res => {
-          // console.log('res.body:  ', res.body);
           assert.isOk(res.body);
           done();          
         })
