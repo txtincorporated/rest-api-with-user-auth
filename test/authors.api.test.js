@@ -18,24 +18,7 @@ describe('Test authors resource route', () => {
     const drop = () => connection.db.dropDatabase(done);
     if(connection.readyState === 1) drop(done);
     else connection.on('open', drop);
-    // done();
   });
-
-  // before(done => {
-  //   const CONNECTED = 1;
-  //   if(connection.readyState === CONNECTED) dropCollection();
-  //   else(connection.on('open', dropCollection));
-
-  //   function dropCollection() {
-  //     const name = 'authors';
-  //     connection.db
-  //       .listCollections({name})
-  //       .next((err, collinfo) => {
-  //         if(!collinfo) return done();
-  //         connection.db.dropCollection(name, done);
-  //       });
-  //   };
-  // });
 
   const request = chai.request(app);
 
@@ -82,14 +65,12 @@ describe('Test authors resource route', () => {
   });
 
   it('/POST', done => {
-    console.log('User token: ', token);    
     request 
       .post('/api/authors')
       .set('authorization', 'Bearer ' + token)
       .send(trout)
       .then(res => {
         authResult = res.body;
-        console.log('authResult POST: ', authResult);
         trout.__v = 0;
         trout._id = authResult._id;
         assert.deepEqual(authResult, trout);
@@ -103,8 +84,6 @@ describe('Test authors resource route', () => {
       .get('/api/authors')
       .query({_id:trout._id})
       .then(res => {
-        console.log('authResult GET', authResult);
-        console.log('trout GET: ', trout);
         authResult = res.body;
         assert.deepEqual(authResult, [trout]);
         done();
@@ -118,13 +97,9 @@ describe('Test authors resource route', () => {
       .set('authorization', 'Bearer ' + token)
       .send(sturgeon)
       .then(res => {
-        console.log('authResult PUT1', authResult);
-        console.log('sturgeon1', sturgeon);
         authResult = res.body;
-        console.log('authResult PUT2', authResult);
         sturgeon.__v = 0;
         sturgeon._id = authResult._id;
-        console.log('sturgeon2', sturgeon);
         assert.deepEqual(authResult, sturgeon);
         done();
       })

@@ -22,22 +22,6 @@ describe('Test authorization routes...', () => {
     if(connection.readyState === 1) drop();
     else connection.on('open' ,drop);
   });
-  //If setting test .env vars in `package.json`, better to just drop specific collection
-  // before(done => {
-  //   const CONNECTED = 1;
-  //   if(connection.readyState === CONNECTED) dropCollection();
-  //   else(connection.on('open', dropCollection));
-
-  //   function dropCollection() {
-  //     const name = 'users';
-  //     connection.db
-  //       .listCollections({name})
-  //       .next((err, collinfo) => {
-  //         if(!collinfo) return done();
-  //         connection.db.dropCollection(name, done);
-  //       });
-  //   };
-  // });
 
   const request = chai.request(app);
   const trout = {
@@ -51,7 +35,6 @@ describe('Test authorization routes...', () => {
   describe('Test unauthorized request... ', () => {
 
     it('returns 400 error without token', done => {
-      // console.log('starting 400 no token...');
       request
         .post('/api/authors/')
         .send(trout)
@@ -120,7 +103,6 @@ describe('Test authorization routes...', () => {
         .send(user)
         .then(res => {
           assert.isOk(token = res.body.token);
-          console.log('Token:  ', token);
           done();
         })
         .catch(done);
@@ -135,7 +117,6 @@ describe('Test authorization routes...', () => {
         .post('/api/auth/signin')
         .send(user)
         .then(res => {
-          console.log('res.body.token:  ', res.body.token);
           assert.equal(res.status, 200);
           done();
         })
@@ -148,7 +129,6 @@ describe('Test authorization routes...', () => {
         .set('authorization', 'Bearer ' + token)
         .send(trout)
         .then(res => {
-          // console.log('res.body:  ', res.body);
           assert.isOk(res.body);
           done();          
         })

@@ -20,24 +20,7 @@ describe('test books resource route', () => {
     const drop = () => connection.db.dropDatabase(done);
     if(connection.readyState === 1) drop(done);
     else connection.on('open', drop);
-    // done();
   });
-
-  // before(done => {  
-  //   const CONNECTED = 1;
-  //   if (connection.readyState === CONNECTED) dropCollection();
-  //   else (connection.on('open', dropCollection));
-
-  //   function dropCollection() {
-  //     const name = 'books';
-  //     connection.db
-  //       .listCollections({name})
-  //       .next((err, collinfo) => {
-  //         if (!collinfo) return done();
-  //         connection.db.dropCollection(name, done);
-  //       });
-  //   };
-  // });
 
   const request = chai.request(app);
 
@@ -85,7 +68,6 @@ describe('test books resource route', () => {
 
 
   it('/GET all -- before', done => {
-    console.log('Test books GET all -- before...');
     request
       .get('/api/books')
       .then(res => {
@@ -103,7 +85,6 @@ describe('test books resource route', () => {
       .send(twain)
       .then(res => {
         authResult = res.body;
-        console.log('authResult POST: ', authResult);
         twain.__v = 0;
         twain._id = authResult._id;
         sawyer.authId = twain._id;
@@ -114,17 +95,14 @@ describe('test books resource route', () => {
   });
   
   it('/POST', done => {
-    console.log('Test books POST...');
     request
     .post('/api/books')
     .set('authorization', 'Bearer ' + token)
     .send(sawyer)
     .then(res => {
       bookResult = res.body;
-      console.log('bookResult POST: ', bookResult);
       sawyer.__v = 0;
       sawyer._id = bookResult._id;
-      console.log('sawyer2: ', sawyer);
       assert.deepEqual(bookResult, sawyer);
       done();
     })
@@ -132,14 +110,11 @@ describe('test books resource route', () => {
   });
 
   it('/GET/:id', done => {
-    console.log('Test books GET/:id...');
     sawyer.authId = { _id: `${twain._id}`, name: 'Mark Twain' };
     request
       .get(`/api/books/${sawyer._id}`)
       .then(res => {
-        console.log('sawyer GET: ', sawyer);
         bookResult = res.body;
-        console.log('bookResult GET', bookResult);
         assert.deepEqual([bookResult], [sawyer]);
         done();
       })
@@ -147,20 +122,14 @@ describe('test books resource route', () => {
   });
 
   it('/PUT/:id', done => {
-    console.log('Test books PUT/:id...');
     request
       .put(`/api/books/${sawyer._id}`)
-      // .query({_id:sawyer._id})
       .set('authorization', 'Bearer ' + token)
       .send(clemens)      
       .then(res => {
-        console.log('bookResult PUT1', bookResult);
-        console.log('clemens1: ', clemens);
         bookResult = res.body;
-        console.log('bookResult PUT2', bookResult);
         clemens.__v = 0;
         clemens._id = bookResult._id;
-        console.log('clemens2: ', clemens);
         assert.deepEqual(bookResult, clemens);
         done();
       })
@@ -168,7 +137,6 @@ describe('test books resource route', () => {
   });
 
   it('GET all -- after', done => {
-    console.log('Test books GET all -- after...');
     clemens.authId = { _id: `${twain._id}`, name: 'Mark Twain' };
 
     request
@@ -181,7 +149,6 @@ describe('test books resource route', () => {
   });
 
   it('DELETE /:id', done => {
-    console.log('Test books DELETE...');
     request
       .delete('/api/books')
       .set('authorization', 'Bearer ' + token)
