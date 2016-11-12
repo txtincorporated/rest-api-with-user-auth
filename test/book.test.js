@@ -25,7 +25,6 @@ describe('Book model tests', () => {
     });
 
     book.validate(() => {
-      console.log('Genres: ', book.genres);
       assert.isOk(book.genres);
       done();
     });
